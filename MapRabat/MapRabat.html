@@ -1,0 +1,297 @@
+<html lang = "en">
+
+<head>
+    <meta charset = "UTF-8" />
+    <title>Plan Topographique de la ville Rabat</title>
+    <script
+    src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
+    integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+    crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
+    integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
+    crossorigin=""></script>
+
+    <script src="src/leaflet-timeline-slider.js"></script>
+	
+	
+	
+    <script src="buildings.js" type="text/javascript"></script>
+	<script src="roads.js" type="text/javascript"></script>
+	<script src="points.js" type="text/javascript"></script>
+	<script src="railways.js" type="text/javascript"></script>
+	
+	<style>
+		#mapid {
+			width: 1900px;
+			height: 900px;
+		}
+	</style>
+    
+</head>
+    <body>
+        <div id="mapid">
+        </div>
+
+ 
+        <script type="text/javascript">
+            data = {"type": "FeatureCollection",
+                        "features": [
+                            {
+                                "type": "Feature",
+                                "properties": {
+                                    "title": "Place 1",
+                                    "content": "Je me suis deplacé vers la place N°1"
+                                },
+                                "geometry": {
+                                    "type": "Point",
+                                    "coordinates": [
+                                        -6.87833840122005,
+                                        33.970493488016636,
+                                        1
+                                    ]
+                                }
+                            },
+                            {
+                                "type": "Feature",
+                                "properties": {
+                                    "title": "Place 2",
+                                    "content": "Ici c'est la place numéro 2"
+                                },
+                                "geometry": {
+                                    "type": "Point",  
+                                    "coordinates": [
+                                        -6.884960554130106,
+                                        33.984096940264614,
+                                        1
+                                    ]
+                                }
+                            },
+                            {
+                                "type": "Feature",
+                                "properties": {
+                                    "title": "Place 3",
+                                    "content": "la vue dans la place 3 est top"
+                                },
+                                "geometry": {
+                                    "type": "Point", 
+                                    "coordinates": [
+                                        -6.852717247393664,
+                                        34.007598261739766,
+                                        1
+                                    ]
+                                }
+                            },
+                            {
+                                "type": "Feature",
+                                "properties": {
+                                    "title": "Place 4",
+                                    "content": "La place 4 est proche de la ville"
+                                },
+                                "geometry": {
+                                    "type": "Point",
+                                    "coordinates": [ 
+                                        -6.840999976628746,
+                                        34.01172773375402,
+                                        1
+                                    ]
+                                }
+                            },
+                            {
+                                "type": "Feature",
+                                "properties": {
+                                    "title": "Place 5",
+                                    "content": "à la place 5 y a tout"
+                                    
+                                },
+                                "geometry": {
+                                    "type": "Point",
+                                    "coordinates": [
+                                        -6.849538789679021,
+                                        34.02250878354691,
+                                        1
+                                    ]
+                                }
+                            },
+                            {
+                                "type": "Feature",
+                                "properties": {
+                                    "title": "Place 6",
+                                    "content": "dans la place 6 j'ai arrivé en retard"
+                                },
+                                "geometry": {
+                                    "type": "Point",
+                                    "coordinates": [
+                                        -6.829333325521538,
+                                        34.019037852802846,
+                                        1
+                                    ]
+                                }
+                            },
+                            {
+                                "type": "Feature",
+                                "properties": {
+                                    "title": "Place 7",
+                                    "content": "la fin de la balade est dans la place 7"
+                                },
+                                "geometry": {
+                                    "type": "Point",
+                                    "coordinates": [ 
+                                        -6.817539688456254,
+                                        34.018771581308116,
+                                        1
+                                    ]
+                                }
+                            },
+                        ]
+                    }
+
+            
+            var mymap = L.map('mapid');
+            
+            OpenStreetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(mymap);
+            
+            getDataAddMarkers = function( {label, value, map, exclamation} ) {
+                map.eachLayer(function (layer) {
+                        if (layer instanceof L.Marker) {
+                            map.removeLayer(layer);
+                        }
+                });
+
+                filteredData = data.features.filter(function (i, n) {
+                    return i.properties.title===label;
+                    });
+
+                var markerArray = [];
+                L.geoJson(filteredData, {
+                    onEachFeature: function onEachFeature(feature, layer) {
+                        content = `${exclamation} <br> ${feature.properties.content} <br> (${Math.round(value/7 * 100)}% de la tour à la ville Rabat)`
+                        var popup = L.popup().setContent(content);
+                        layer.bindPopup(popup);
+                        markerArray.push(layer);
+                    }
+                }).addTo(map);
+                
+                var markerGroup = L.featureGroup(markerArray);
+                map.fitBounds(markerGroup.getBounds()).setZoom(18);
+            };
+
+            L.control.timelineSlider({
+                timelineItems: ["Place 1", "Place 2", "Place 3", "Place 4", "Place 5", "Place 6", "Place 7"], 
+                changeMap: getDataAddMarkers,
+                extraChangeMapParams: {exclamation: "La Ville Rabat"} })
+            .addTo(mymap);
+
+
+
+					function stylisermonFeature1(feature) {
+		return {
+			weight: 3,
+			opacity: 1,
+			color: 'white',
+			dashArray: '3',
+			fillOpacity: 0.7,
+			fillColor: 'red'
+		};
+	}
+	
+	function stylisermonFeature2(feature) {
+		return {
+			weight: 3,
+			opacity: 1,
+			color: 'black',
+			dashArray: '3',
+			fillOpacity: 0.7,
+			fillColor: 'black'
+		};
+	}
+	
+	function stylisermonFeature3(feature) {
+		return {
+			weight: 3,
+			opacity: 1,
+			color: 'green',
+			dashArray: '3',
+			fillOpacity: 0.7,
+			fillColor: 'green'
+		};
+	}
+	
+	function stylisermonFeature4(feature) {
+		return {
+			weight: 3,
+			opacity: 1,
+			color: 'white',
+			dashArray: '3',
+			fillOpacity: 0.7,
+			fillColor: 'white'
+		};
+	}
+	
+	
+	a1 = L.geoJSON(build,{
+	style: stylisermonFeature1,
+	}).addTo(mymap);
+
+	a2 = L.geoJSON(road, {
+	style: stylisermonFeature2,
+	}).addTo(mymap);
+	
+	a4 = L.geoJSON(poin, {
+	style: stylisermonFeature4,
+	}).addTo(mymap);
+
+
+
+	a3 = L.geoJSON(railway, {
+	style: stylisermonFeature3,
+	}).addTo(mymap);
+	
+	//Google Map layer
+googleStreets = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
+    maxZoom: 20,
+    subdomains:['mt0','mt1','mt2','mt3']
+});
+
+//Satellite layer
+googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
+    maxZoom: 20,
+    subdomains:['mt0','mt1','mt2','mt3']
+});
+
+//Terrain layer
+googleTerrain = L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',{
+    maxZoom: 20,
+    subdomains:['mt0','mt1','mt2','mt3']
+});
+
+
+// Layer Control
+var baseLayers = {
+    "Terrain": googleTerrain,
+	"Satellite": googleSat,
+	"Google Map": googleStreets,
+	"OpenStreetMap" : OpenStreetMap,
+};
+
+
+var overlays = {
+    "Construction": a1,
+	"Les routes": a2,
+	"TrameWay": a3,
+	"Lieu": a4
+	
+};
+
+L.control.layers(baseLayers, overlays).addTo(mymap);	
+	
+
+        </script>
+    </body>
+
+</html>
