@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset=utf-8 />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui' />
+	<title>Map Compare slider view zoom</title>
+    <script src='http://cdn.leafletjs.com/leaflet/v1.3.1/leaflet.js'></script>
+    
+    <link href='http://cdn.leafletjs.com/leaflet/v1.3.1/leaflet.css' rel='stylesheet' />
+    <style>
+    body {
+        margin: 0;
+        padding: 0;
+    }
+    #map1 {
+        border-right: 5px solid red;
+    }
+	.cols {
+		flex:50%;
+		height:100vh;
+		}
+	.row{
+	display: flex;
+	}
+    </style>
+</head>
+
+<body>
+	<div class="row">
+    <div class="cols" id='map1'></div>
+	<div class="cols" id='map2'></div>
+	</div>
+</body>
+</html>
+
+<!-- leaflet js -->
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+<!-- leaflet js side by side -->
+<script src="leaflet-side-by-side.js"></script>
+
+<!-- map sync file js -->
+<script src="L.Map.Sync.js"></script>
+<script>
+var map1 = L.map('map1').setView([34.009944, -6.916528], 13);
+var map2 = L.map('map2').setView([34.009944, -6.916528], 13);
+
+ var osmLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap<\/a> contributors'
+    }).addTo(map2);
+
+    var stamenLayer = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.png', {
+        attribution:
+            'Map tiles by <a href="http://stamen.com">Stamen Design<\/a>, ' +
+            '<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0<\/a> &mdash; ' +
+            'Map data {attribution.OpenStreetMap}',
+        
+    }).addTo(map1);
+	
+	
+	var imageUrl ='clasi_res.png';
+	var imageBounds1 = [[34.009944, -6.916528],
+						[33.956897, -6.816778]];
+	var a = L.imageOverlay(imageUrl, imageBounds1).addTo(map1);
+	// map.fitBounds(image);
+	var imageUr2 ='Rabat2.jpg';
+	var imageBounds2 = [[34.009944, -6.916528],
+						[33.956897, -6.816778]];
+	var b = L.imageOverlay(imageUr2, imageBounds2).addTo(map2);	
+
+/*var baselayer = {
+		"osm": osmLayer,
+		"water color": stamenLayer
+	}
+	
+	var overlayer = {
+		"image1": a,
+		"image2": b
+	}
+	
+	L.control.layers(baselayer, overlayer).addTo(map1);*/ 
+
+   // L.control.sideBySide(stamenLayer, osmLayer).addTo(map1);
+   
+map1.sync(map2)
+map2.sync(map1)
+
+
+</script>

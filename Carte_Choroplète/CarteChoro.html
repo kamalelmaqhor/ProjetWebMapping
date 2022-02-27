@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+	
+	<title>Choropleth Tutorial - Leaflet</title>
+	
+	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+	<link rel="stylesheet" href="leaflet.css" />
+	<script src="leaflet.js"></script>
+
+
+
+	<script
+    src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
+    integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+    crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
+    integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
+    crossorigin=""></script>
+
+    <script src="src/leaflet-timeline-slider.js"></script>
+	
+
+	<style>
+		#map {
+			width: 1900px;
+			height: 900px;
+		}
+		.info {
+		    padding: 6px 8px;
+		    font: 14px/16px Arial, Helvetica, sans-serif;
+		    background: white;
+		    background: rgba(255,255,255,0.8);
+		    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+		    border-radius: 5px;
+		}
+		.info h4 {
+		    margin: 0 0 5px;
+		    color: #777;
+		}
+		
+		
+		.legend {
+			line-height: 18px;
+			color: #555;
+			}
+    
+		.legend i {
+			width: 18px;
+			height: 18px;
+			float: left;
+			margin-right: 8px;
+			opacity: 0.7;
+					}
+	</style>
+
+	
+</head>
+<body>
+
+<div id='map'></div>
+
+<script type="text/javascript" src="Build_choro.js"></script>
+
+<script type="text/javascript">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	var map = L.map('map').setView([34.016309363750985, -6.841608620274723], 16);
+
+OpenStreetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+	}).addTo(map);
+
+
+// get color depending on population density value
+	function getColor(attribut) {
+		return attribut <= 7400 ? '#fdcc8a' :
+			   attribut <= 200000 ? '#fc8d59' :
+			   attribut <= 600000 ? '#e34a33' :
+			   attribut <= 900000 ? '#b30000' :
+			   attribut <= 4000000 ? '#c30000' :
+ 		
+							'#16B84E';
+	}
+
+
+/*
+	// get color depending on population density value
+	function getColor(d) {
+		return d == "Saharienne" ? '#800026' :
+							'#FFEDA0';
+	}
+*/
+	function Monstyle(feature) {
+		return {
+			weight: 2,
+			opacity: 1,
+			color: 'white',
+			dashArray: '3',
+			fillOpacity: 0.7,
+			fillColor: getColor(feature.properties.prix_ven)
+		};
+	}
+
+	function highlightFeature(e) {
+	    var layer = e.target;
+
+	    layer.setStyle({
+	        weight: 5,
+	        color: '#666',
+	        dashArray: '',
+	        fillOpacity: 0.7
+	    });
+
+	    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+	        layer.bringToFront();
+	    }
+	        info.update(layer.feature.properties);
+
+	}
+
+	function resetHighlight(e) {
+    	geojson.resetStyle(e.target);
+    	    info.update();
+
+	}
+	function zoomToFeature(e) {
+    map.fitBounds(e.target.getBounds());
+}
+	function onEachFeature(feature, layer) {
+    layer.on({
+        mouseover: highlightFeature,
+        mouseout: resetHighlight,
+        click: zoomToFeature
+    });
+}
+var info = L.control();
+
+info.onAdd = function (map) {
+    this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+    this.update();
+    return this._div;
+};
+
+
+
+	function stylisermonFeature(feature) {
+		return {
+			weight: 2,
+			opacity: 1,
+			color: 'white',
+			dashArray: '3',
+			fillOpacity: 0.7,
+			fillColor: getColor(feature.properties.Confirmes)
+		};
+	}
+
+
+
+// method that we will use to update the control based on feature properties passed
+info.update = function (props) {
+    this._div.innerHTML = '<h4>Les informations sur les biens sont : </h4>' +  (props ?
+        'Nom de construction : <b>' + props.name + '</b> <br />Valeur vénale : <b>' + props.prix_ven + '</b> .....</sup>'
+        : 'Merci de mettre le cursuer sur la commune');
+};
+
+info.addTo(map);
+
+
+
+var legend = L.control({position: 'bottomright'});
+
+legend.onAdd = function (map) {
+
+    var div = L.DomUtil.create('div', 'info legend'),
+        grades = [7400, 200000, 600000, 900000, 3000000];
+
+    div.innerHTML += '<h4>La Valeur vénale du bien </h4>';
+    for (var i = 0; i < grades.length; i++) {
+        div.innerHTML +=
+            '<i style="background:' + getColor((grades[i] + 1)) + '"></i> ' +
+            grades[i] + (grades[i + 1] ? ' Dh – ' + grades[i + 1] + ' Dh <br>' : '+');
+    }
+
+    return div;
+};
+
+legend.addTo(map);
+
+
+
+
+
+	var geojson = L.geoJson(Build, {
+		style: Monstyle,
+	    onEachFeature: onEachFeature,
+}).addTo(map);
+
+
+
+
+
+        // var overlayMaps = {
+        //     "geojson": geojson,
+        //  };
+
+        // //var control = L.control.layers(baseMaps, overlayMaps)
+        // var control = L.control.selectLayers(  overlayMaps)
+        // control.addTo(map);
+
+//Google Map layer
+googleStreets = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
+    maxZoom: 20,
+    subdomains:['mt0','mt1','mt2','mt3']
+});
+
+//Satellite layer
+googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
+    maxZoom: 20,
+    subdomains:['mt0','mt1','mt2','mt3']
+});
+
+//Terrain layer
+googleTerrain = L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',{
+    maxZoom: 20,
+    subdomains:['mt0','mt1','mt2','mt3']
+});
+
+
+// Layer Control
+var baseLayers = {
+    "Terrain": googleTerrain,
+	"Satellite": googleSat,
+	"Google Map": googleStreets,
+	"OpenStreetMap" : OpenStreetMap,
+};
+
+
+var overlays = {
+    "Les Biens": geojson,
+};
+
+L.control.layers(baseLayers, overlays).addTo(map);
+
+
+
+
+        
+
+</script>
+
+</body>
+</html>
