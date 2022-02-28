@@ -44,6 +44,8 @@
 <script>
 var map1 = L.map('map1').setView([34.009944, -6.916528], 13);
 var map2 = L.map('map2').setView([34.009944, -6.916528], 13);
+L.control.scale().addTo(map1);
+L.control.scale().addTo(map2);
 
  var osmLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap<\/a> contributors'
