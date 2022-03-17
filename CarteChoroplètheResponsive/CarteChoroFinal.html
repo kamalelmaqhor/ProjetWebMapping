@@ -73,9 +73,7 @@
     var map = L.map('map').setView([34.016309363750985, -6.841608620274723], 16);
 	L.control.scale().addTo(map);
 
-OpenStreetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-	    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-	}).addTo(map);
+
 
 
 // get color depending on population density value
@@ -238,7 +236,6 @@ var baseLayers = {
     "Terrain": googleTerrain,
 	"Satellite": googleSat,
 	"Google Map": googleStreets,
-	"OpenStreetMap" : OpenStreetMap,
 };
 
 
